@@ -26,7 +26,6 @@ scenario = {
                 "tank hits that do not set off mines and spawn starts. " ..
                 "Nothing can be changed in the lobby.",
   api = 1,
-  author = "canuck/jm/rooklift",
   updated = "2026-10-28T13:34Z",
   kind = "mod",
   bound = false,
