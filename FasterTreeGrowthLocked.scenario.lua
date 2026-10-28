@@ -26,7 +26,7 @@
 
 scenario = {
   name = "Faster Tree Growth",
-  description = "Trees grow back twice as fast. Nothing can be changed in the lobby.",
+  description = "Trees grow back twice as fast.",
   api = 1,
   updated = "2026-10-28T14:01Z",
   kind = "mod",

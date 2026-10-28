@@ -21,10 +21,7 @@
 
 scenario = {
   name = "Mac Bolo Rules",
-  description = "Plays the Mac Bolo shell pushback, pillbox shell cap, " ..
-                "tank clearance, pillbox massage, base defence circle, " ..
-                "tank hits that do not set off mines and spawn starts. " ..
-                "Nothing can be changed in the lobby.",
+  description = "Includes pillbox massage, base defence circle, etc etc."
   api = 1,
   updated = "2026-10-28T14:01Z",
   kind = "mod",

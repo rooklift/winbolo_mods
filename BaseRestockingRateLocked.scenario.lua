@@ -29,7 +29,7 @@
 
 scenario = {
   name = "Base Restocking Rate",
-  description = "Bases refill their own stock twice as often. Nothing can be changed in the lobby.",
+  description = "Bases refill their own stock twice as often.",
   api = 1,
   updated = "2026-10-28T14:01Z",
   kind = "mod",
