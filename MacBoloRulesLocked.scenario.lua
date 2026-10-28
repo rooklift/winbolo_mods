@@ -21,7 +21,7 @@
 
 scenario = {
   name = "Mac Bolo Rules",
-  description = "Includes pillbox massage, base defence circle, etc etc."
+  description = "Includes pillbox massage, base defence circle, etc etc.",
   api = 1,
   updated = "2026-10-28T14:01Z",
   kind = "mod",
