@@ -1,6 +1,6 @@
 -- =========================================================================
 -- Mac Bolo Rules Locked Turn Fix — Mac Bolo Rules Locked, with every turn
--- rate a ten-thousandth faster, as a stopgap for a drawing bug.
+-- rate about 0.1% faster, as a stopgap for a drawing bug.
 --
 -- It plays what the Mac Bolo Rules mod plays when the host leaves every
 -- setting alone: shell pushback (28 at full armour, 32 more at zero, shift
@@ -21,11 +21,15 @@
 -- classic turn rates (1, 0.5 and 0.25 a tick, an eighth of that while a
 -- turn starts) add up to exact whole numbers, so a turning tank stops on
 -- these headings often. Every turn rate here is its classic value times
--- 1.0001: the heading then passes 72.0008 instead of 72, and only a rare
--- rounding coincidence can stop it on a halfway heading. Nobody can feel a
--- turn a ten-thousandth faster. A script that teleports a tank to face
--- exactly halfway still shows the bug. Once WinBolo itself is fixed, play
--- Mac Bolo Rules Locked instead.
+-- 1 + 1/1024, about 0.1% faster, which nobody can feel. The factor is a
+-- power-of-two fraction, so every heading a tank can reach stays exact: a
+-- turn that would stop on 72 stops 1/128 or 3/128 to one side of it
+-- instead. That is enough to survive the server cutting the heading down
+-- to 1/256 when it sends it to the other players, which a smaller nudge
+-- does not. Only a tank that has turned about 16 whole circles more one
+-- way than the other since it spawned can still land on a halfway heading,
+-- and a script that teleports a tank to face exactly halfway still shows
+-- the bug. Once WinBolo itself is fixed, put the classic turn rates back.
 --
 -- kind = "mod", so it leaves the win condition alone and can be added to
 -- any round, beside a scenario or on its own. bound = false, so it runs
@@ -35,9 +39,9 @@
 scenario = {
   name = "Mac Bolo Rules",
   description = "Includes pillbox massage, base defence circle, etc etc. " ..
-                "Turn rates are 0.01% faster to work around a WinBolo bug.",
+                "Turn rates are about 0.1% faster to work around a WinBolo bug.",
   api = 1,
-  updated = "2026-10-29T08:10Z",
+  updated = "2026-10-29T08:19Z",
   kind = "mod",
   bound = false,
 
@@ -66,18 +70,18 @@ scenario = {
     -- its square alone.
     tank_hit_sets_off_mines = 0,
 
-    -- Turn rates: the classic rates times 1.0001, so a turning tank does
-    -- not stop exactly halfway between two directions (see above).
-    turn_road = 1.0001,
-    turn_grass = 1.0001,
-    turn_forest = 0.50005,
-    turn_river = 0.250025,
-    turn_swamp = 0.250025,
-    turn_crater = 0.250025,
-    turn_rubble = 0.250025,
-    turn_boat = 1.0001,
-    turn_deep_sea = 0.50005,
-    turn_refuel_base = 1.0001,
+    -- Turn rates: the classic rates times 1 + 1/1024, so a turning tank
+    -- does not stop exactly halfway between two directions (see above).
+    turn_road = 1.0009765625,
+    turn_grass = 1.0009765625,
+    turn_forest = 0.50048828125,
+    turn_river = 0.250244140625,
+    turn_swamp = 0.250244140625,
+    turn_crater = 0.250244140625,
+    turn_rubble = 0.250244140625,
+    turn_boat = 1.0009765625,
+    turn_deep_sea = 0.50048828125,
+    turn_refuel_base = 1.0009765625,
   },
 
   callbacks = {
