@@ -1,6 +1,7 @@
 -- =========================================================================
--- Mac Bolo Rules — a mod that plays the Mac Bolo rules WinBolo has as
--- settings, all at once.
+-- Mac Bolo Rules Locked Turn Fix — the Mac Bolo Rules mod with every part
+-- on at its default and nothing for the host to change, and with every
+-- turn rate about 0.1% faster, as a stopgap for a drawing bug.
 --
 -- Shell pushback. A tank a shell hits and survives slides along the
 -- shell's direction of travel. WinBolo slides every tank the same
@@ -12,11 +13,9 @@
 -- tank_bump_decay_shift, are read per 40 ms, so a push travels
 -- step * 2^shift in all, in a slide that moves every tick.
 --
--- Pillbox shell cap. No more than pill_max_shells_at_tank pillbox shells
--- are in the air at any one tank. A pillbox whose nearest target already
--- has that many coming fires at the next nearest enemy in range instead;
--- with no other target it holds its shot and fires as soon as one of those
--- shells lands. The limit is twelve by default.
+-- Pillbox shell cap. Mac Bolo keeps twelve shell slots for the pillbox
+-- shells in the air at one tank. pill_shell_cap turns WinBolo's version of
+-- that limit on, at pill_max_shells_at_tank, twelve.
 --
 -- Tank clearance. Use the original direction-dependent tank boxes and
 -- pixel nudges against solid tiles, allowing close passes beside pills.
@@ -56,10 +55,9 @@
 -- seat on: the start its player picked by hand, else one on the team's
 -- side, else the engine's own spread of the field. That start is the
 -- seat's for its first tank of the round only, so a later spawn is told
--- nothing. By default the mod hands the lobby's start straight back, so
--- the round's opening tanks go where the lobby put them, and every spawn
--- the lobby has no start for is Mac Bolo's. Turn first_start_lobby off
--- to give the opening tanks the Mac Bolo pick too.
+-- nothing. The mod hands the lobby's start straight back, so the round's
+-- opening tanks go where the lobby put them, and every spawn the lobby has
+-- no start for is Mac Bolo's.
 --
 -- The Mac Bolo pick (randstart) looks only at starts on deep sea with no
 -- mine, going round them from a random one. It takes the first with
@@ -80,44 +78,26 @@
 -- friendly pillbox there hides an enemy one; the mod judges each pillbox
 -- by its own owner.
 --
--- Settings. The host turns each part on or off in the lobby's details
--- dialog, and sets the numbers a part plays with (scenario.settings below).
--- Every part is on by default, at the numbers above.
+-- Turn rates. With the Mac Bolo tank collision boxes on, a tank whose
+-- heading is exactly halfway between two of the 16 directions (8, 24 ...
+-- 248, out of 256) drives the higher direction but is drawn as the lower
+-- one, so a tank stopped on 72 looks east and drives east-south-east. The
+-- classic turn rates (1, 0.5 and 0.25 a tick, an eighth of that while a
+-- turn starts) add up to exact whole numbers, so a turning tank stops on
+-- these headings often. Every turn rate here is its classic value times
+-- 1 + 1/1024, about 0.1% faster, which nobody can feel. The factor is a
+-- power-of-two fraction, so every heading a tank can reach stays exact: a
+-- turn that would stop on 72 stops 1/128 or 3/128 to one side of it
+-- instead. That is enough to survive the server cutting the heading down
+-- to 1/256 when it sends it to the other players, which a smaller nudge
+-- does not. Only a tank that has turned about 16 whole circles more one
+-- way than the other since it spawned can still land on a halfway heading,
+-- and a script that teleports a tank to face exactly halfway still shows
+-- the bug. Once WinBolo itself is fixed, put the classic turn rates back.
 --
---   pushback            Mac Bolo shell pushback (tank_slide_mac).
---   push_step           its push at full armour (tank_slide_step, 28).
---   push_armour_bonus   its extra push at zero armour
---                       (tank_slide_armour_bonus, 32).
---   push_decay_shift    its slide length (tank_bump_decay_shift, 2).
---   shell_cap           pillbox shell cap (pill_shell_cap).
---   shell_cap_count     shells in the air at one tank
---                       (pill_max_shells_at_tank, 12).
---   tank_boxes          tank clearance (tank_collision_mac).
---   pill_aim            pillbox aiming and massage (pill_aim_mac).
---   pill_anger          angry pillbox fire rate
---                       (pill_attack_min_ticks, 5).
---   base_defence        base defence circle (pill_base_defend_shape).
---   base_defence_radius its radius (pill_base_defend_range, 7).
---   tank_hit_mines      tank hits do not set off mines
---                       (tank_hit_sets_off_mines). 0 is the default,
---                       and this part keeps it at 0.
---   spawn_starts        the Mac Bolo start pick for spawns.
---   first_start_lobby   "Override first start to what was chosen in lobby".
---                       On (the default): a tank the lobby has a start
---                       for takes it, as above. Off: the Mac Bolo pick
---                       places the opening tanks too. Has no effect
---                       while spawn_starts is off.
---
--- A part that is off sets none of its rules: the round plays the classic
--- table there, or the value another script on the list sets. Its numbers
--- are then not read. With spawn_starts off, on_choose_start names no start
--- and the engine picks every start as it always does.
---
--- The rules table is built from the settings when the file runs, so the
--- rules are in force before the opening tanks are built and keep the list's
--- order of precedence, as a written-out table does. The lobby's script list
--- reads the file with no settings to hand, so its details dialog shows the
--- rules every part plays with on its defaults.
+-- There is no settings table, so the lobby's details dialog has nothing to
+-- set, and every round with this mod on plays the same rules. A host who
+-- wants to change a part plays the Mac Bolo Rules mod instead.
 --
 -- kind = "mod", so it leaves the win condition alone and can be added to
 -- any round, beside a scenario or on its own. bound = false, so it runs
@@ -126,153 +106,59 @@
 
 scenario = {
   name = "Mac Bolo Rules",
-  description = "Plays the Mac Bolo shell pushback, pillbox shell cap, " ..
-                "tank clearance, pillbox massage, angry pillbox fire " ..
-                "rate, base defence circle, " ..
-                "tank hits that do not set off mines and spawn starts. " ..
-                "Each part can be turned off in the lobby.",
+  description = "Includes pillbox massage, base defence circle, etc etc. " ..
+                "Turn rates are about 0.1% faster to work around a WinBolo bug.",
   api = 1,
-  author = "WinBolo",
   updated = "2026-10-30T13:47Z",
   kind = "mod",
   bound = false,
 
-  -- What the host sets in the lobby's details dialog, in the order of the
-  -- parts above. The rules table below is built from these.
-  settings = {
+  rules = {
     -- Shell pushback: the Mac Bolo push, harder on a weakened tank.
-    { id = "pushback", label = "Mac Bolo shell pushback", type = "bool",
-      default = true },
-    -- The push at full armour, in world units per 40 ms.
-    { id = "push_step", label = "Pushback at full armour", type = "int",
-      min = 0, max = 63, step = 1, default = 28 },
-    -- The extra push at zero armour, scaled by the armour missing. The rule
-    -- allows 255; the max is capped by the dropdown's 100 entries.
-    { id = "push_armour_bonus", label = "Pushback extra at zero armour",
-      type = "int", min = 0, max = 96, step = 1, default = 32 },
-    -- The slide's length: a push travels step * 2^shift in all.
-    { id = "push_decay_shift", label = "Pushback slide length (shift)",
-      type = "int", min = 0, max = 31, step = 1, default = 2 },
+    tank_slide_mac = 1,
+    tank_slide_step = 28,
+    tank_slide_armour_bonus = 32,
+    tank_bump_decay_shift = 2,
 
-    -- Pillbox shell cap: a pill holds or retargets when its target already
-    -- has this many pillbox shells coming.
-    { id = "shell_cap", label = "Pillbox shell cap", type = "bool",
-      default = true },
-    -- The rule allows 255; the max is capped by the dropdown's 100 entries.
-    { id = "shell_cap_count", label = "Pillbox shells in the air at one tank",
-      type = "int", min = 1, max = 100, step = 1, default = 12 },
+    -- Pillbox shell cap: twelve pillbox shells in the air at one tank.
+    pill_shell_cap = 1,
+    pill_max_shells_at_tank = 12,
 
     -- Tank clearance: the Mac Bolo tank boxes against solid squares.
-    { id = "tank_boxes", label = "Mac Bolo tank collision boxes",
-      type = "bool", default = true },
+    tank_collision_mac = 1,
 
     -- Pillbox aiming: Mac Bolo's lead, with the massage bug up close.
-    { id = "pill_aim", label = "Mac Bolo pillbox aiming and massage",
-      type = "bool", default = true },
+    pill_aim_mac = 1,
 
     -- Angry pillbox fire rate: Mac Bolo's fastest, a shot every 5 ticks.
-    { id = "pill_anger", label = "Mac Bolo angry pillbox fire rate",
-      type = "bool", default = true },
+    pill_attack_min_ticks = 5,
 
-    -- Base defence: a circle round a shot base instead of a square.
-    { id = "base_defence", label = "Mac Bolo base defence circle",
-      type = "bool", default = true },
-    -- Its radius in map squares, with the edge left out.
-    { id = "base_defence_radius", label = "Base defence circle radius",
-      type = "int", min = 1, max = 30, step = 1, default = 7 },
+    -- Base defence: a circle of radius 7 round a shot base, edge left out.
+    pill_base_defend_shape = 1,
+    pill_base_defend_range = 7,
 
     -- Tank hits and mines: a shell that hits a tank leaves the mines on
-    -- its square alone. That is the default; the part keeps it so when
-    -- another script sets the rule to 1.
-    { id = "tank_hit_mines", label = "Tank hits do not set off mines",
-      type = "bool", default = true },
+    -- its square alone.
+    tank_hit_sets_off_mines = 0,
 
-    -- Starts: the two-pass Mac Bolo pick for spawns.
-    { id = "spawn_starts", label = "Mac Bolo spawn starts", type = "bool",
-      default = true },
-    -- On: a tank the lobby has a start for takes it. Off: the Mac Bolo pick
-    -- places the opening tanks too. Has no effect while spawn_starts is off.
-    { id = "first_start_lobby",
-      label = "Override first start to what was chosen in lobby",
-      type = "bool", default = true },
+    -- Turn rates: the classic rates times 1 + 1/1024, so a turning tank
+    -- does not stop exactly halfway between two directions (see above).
+    turn_road = 1.0009765625,
+    turn_grass = 1.0009765625,
+    turn_forest = 0.50048828125,
+    turn_river = 0.250244140625,
+    turn_swamp = 0.250244140625,
+    turn_crater = 0.250244140625,
+    turn_rubble = 0.250244140625,
+    turn_boat = 1.0009765625,
+    turn_deep_sea = 0.50048828125,
+    turn_refuel_base = 1.0009765625,
   },
 
   callbacks = {
-    on_choose_start = "Keeps the lobby's start for an opening tank; else Mac Bolo's pick: a start with no tank or pill near, else none of the enemy's. Spawn starts off: engine picks.",
+    on_choose_start = "Keeps the lobby's start for an opening tank; else Mac Bolo's pick: a start with no tank or pill near, else none of the enemy's.",
   },
 }
-
--- ---- Settings ------------------------------------------------------------
-
--- game.setting gives the host's choice for one of the settings above, or
--- its declared default. With no host behind it (the lobby's script list and
--- -validate) it gives the default, so the rules the details dialog shows
--- are the ones the defaults play.
-
--- Read once, when the file runs: the values are fixed for the round, and
--- the rules below have to be known before the round boots.
-local PUSHBACK          = game.setting("pushback")
-local SHELL_CAP         = game.setting("shell_cap")
-local TANK_BOXES        = game.setting("tank_boxes")
-local PILL_AIM          = game.setting("pill_aim")
-local PILL_ANGER        = game.setting("pill_anger")
-local BASE_DEFENCE      = game.setting("base_defence")
-local TANK_HIT_MINES    = game.setting("tank_hit_mines")
-local SPAWN_STARTS      = game.setting("spawn_starts")
-local FIRST_START_LOBBY = game.setting("first_start_lobby")
-
--- The round's rules, one block per part that is on. A part that is off
--- writes nothing, so the rule stays at the classic table's value or at the
--- value another script sets.
-local rules = {}
-
-if PUSHBACK then
-  -- Turn the Mac Bolo push on; the classic table plays with it off.
-  rules.tank_slide_mac = 1
-  -- The push at full armour, in world units per 40 ms (28 by default).
-  rules.tank_slide_step = game.setting("push_step")
-  -- 32 and 2 by default, the rules' own defaults, written here so the mod
-  -- says what it plays with rather than relying on them.
-  rules.tank_slide_armour_bonus = game.setting("push_armour_bonus")
-  rules.tank_bump_decay_shift = game.setting("push_decay_shift")
-end
-
-if SHELL_CAP then
-  -- Turn the cap on; the classic table plays with it off. Twelve by
-  -- default, the rule's own default, written here for the same reason.
-  rules.pill_shell_cap = 1
-  rules.pill_max_shells_at_tank = game.setting("shell_cap_count")
-end
-
-if TANK_BOXES then
-  -- Original sprite boxes let a tank hug a pill inside its bad-lead range.
-  rules.tank_collision_mac = 1
-end
-
-if PILL_AIM then
-  -- Original Mac Bolo aiming, including the unsigned pill-massage bug.
-  rules.pill_aim_mac = 1
-end
-
-if PILL_ANGER then
-  -- Mac Bolo's fastest angry pillbox: a shot every 5 ticks.
-  rules.pill_attack_min_ticks = 5
-end
-
-if BASE_DEFENCE then
-  -- 1 is a circle, 0 the classic square.
-  rules.pill_base_defend_shape = 1
-  -- A radius, with the edge left out (7 by default).
-  rules.pill_base_defend_range = game.setting("base_defence_radius")
-end
-
-if TANK_HIT_MINES then
-  -- 0 leaves the mines under a tank that is hit alone. The classic table
-  -- plays with 0 too, so this only matters when another script sets 1.
-  rules.tank_hit_sets_off_mines = 0
-end
-
-scenario.rules = rules
 
 -- ---- Starts --------------------------------------------------------------
 
@@ -341,16 +227,10 @@ end
 -- counts, or nil when it chose none. The lobby chooses for each seat's
 -- first tank of the round and for no spawn after it.
 function on_choose_start(p, lobby)
-  -- With the part off, every start is the engine's.
-  if not SPAWN_STARTS then
-    return nil
-  end
-
-  -- By default the opening placement is the lobby's: each player's start,
-  -- picked by hand or by the team's side, is the one handed back. A spawn
-  -- the lobby chose nothing for is Mac Bolo's. With first_start_lobby off,
-  -- the Mac Bolo pick places the opening tanks too.
-  if FIRST_START_LOBBY and lobby ~= nil then
+  -- The opening placement is the lobby's: each player's start, picked by
+  -- hand or by the team's side, is the one handed back. A spawn the lobby
+  -- chose nothing for is Mac Bolo's.
+  if lobby ~= nil then
     return lobby
   end
 
