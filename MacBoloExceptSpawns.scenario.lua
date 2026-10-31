@@ -1,7 +1,8 @@
 -- =========================================================================
--- Mac Bolo Rules Locked Turn Fix — the Mac Bolo Rules mod with every part
--- on at its default and nothing for the host to change, and with every
--- turn rate about 0.1% faster, as a stopgap for a drawing bug.
+-- Mac Bolo Except Spawns — the Mac Bolo Rules mod with every part on at
+-- its default and nothing for the host to change, with every turn rate
+-- about 0.1% faster, as a stopgap for a drawing bug, and with WinBolo's
+-- own spawn logic in place of Mac Bolo's.
 --
 -- Shell pushback. A tank a shell hits and survives slides along the
 -- shell's direction of travel. WinBolo slides every tank the same
@@ -51,32 +52,9 @@
 -- This part keeps the rule at 0, so it only changes the round when
 -- another script on the list sets 1.
 --
--- Starts. The engine tells on_choose_start which start the lobby put the
--- seat on: the start its player picked by hand, else one on the team's
--- side, else the engine's own spread of the field. That start is the
--- seat's for its first tank of the round only, so a later spawn is told
--- nothing. The mod hands the lobby's start straight back, so the round's
--- opening tanks go where the lobby put them, and every spawn the lobby has
--- no start for is Mac Bolo's.
---
--- The Mac Bolo pick (randstart) looks only at starts on deep sea with no
--- mine, going round them from a random one. It takes the first with
--- nothing near it at all: no tank and no pillbox, whoever owns them. If
--- every start has something near it, it takes one with no enemy tank and no
--- enemy pillbox near it. If none is free of enemies, it takes the first
--- usable start it looked at, or the map's first start if none is usable.
--- The engine then moves the tank off the start to the nearest clear
--- square, as Mac Bolo does.
---
--- "Near" is Mac Bolo's own distance: under 16 squares for a tank and under
--- 9 for a pillbox, measured as a circle. A dead tank does not count. A dead
--- pillbox does; one being carried does not.
---
--- "Enemy" is the game's own alliances, including those made and broken in
--- play. A neutral pillbox counts as an enemy one. Mac Bolo judges every
--- pillbox near a start by the owner of the first one (BOLO BUG 3), so a
--- friendly pillbox there hides an enemy one; the mod judges each pillbox
--- by its own owner.
+-- Starts. WinBolo picks every start itself, as it does with no mod on:
+-- the round's opening tanks go where the lobby put them, and every later
+-- spawn uses the engine's own pick, not Mac Bolo's.
 --
 -- Turn rates. With the Mac Bolo tank collision boxes on, a tank whose
 -- heading is exactly halfway between two of the 16 directions (8, 24 ...
@@ -105,11 +83,12 @@
 -- =========================================================================
 
 scenario = {
-  name = "Mac Bolo Rules",
+  name = "Mac Bolo Except Spawns",
   description = "Includes pillbox massage, base defence circle, etc etc. " ..
-                "Turn rates are about 0.1% faster to work around a WinBolo bug.",
+                "Turn rates are about 0.1% faster to work around a WinBolo bug. " ..
+                "Spawns use WinBolo's own logic.",
   api = 1,
-  updated = "2026-10-30T13:47Z",
+  updated = "2026-10-31T17:19Z",
   kind = "mod",
   bound = false,
 
@@ -154,114 +133,4 @@ scenario = {
     turn_deep_sea = 0.50048828125,
     turn_refuel_base = 1.0009765625,
   },
-
-  callbacks = {
-    on_choose_start = "Keeps the lobby's start for an opening tank; else Mac Bolo's pick: a start with no tank or pill near, else none of the enemy's.",
-  },
 }
-
--- ---- Starts --------------------------------------------------------------
-
--- Mac Bolo's ranges, in map squares: a tank under 16 squares from a
--- start, or a pillbox under 9, is near it.
-local TANK_NEAR = 16
-local PILL_NEAR = 9
-
--- Whether a point dx, dy world units away is under squares map squares
--- off, as a circle.
-local function within(dx, dy, squares)
-  local r = squares * 256
-  return dx * dx + dy * dy < r * r
-end
-
--- A map square's middle in world units, where a tank put on it stands.
-local function square_middle(m)
-  return m * 256 + 128
-end
-
--- Whether seat q is on seat p's side, by the game's own alliances.
-local function is_friend(p, q)
-  return q == p or game.allied(p, q) == true
-end
-
--- What is near start s for seat p: whether any tank or pill is, and whether
--- an enemy tank or enemy pill is.
-local function survey(p, s)
-  local sx, sy = square_middle(s.x), square_middle(s.y)
-  local any, enemy = false, false
-
-  for q = 0, game.max_tanks() - 1 do
-    if q ~= p then
-      local t = game.tank(q)
-      if t and not t.dead and within(t.wx - sx, t.wy - sy, TANK_NEAR) then
-        any = true
-        if not is_friend(p, q) then
-          enemy = true
-        end
-      end
-    end
-  end
-
-  -- A pillbox being carried is not on the map. A dead one still counts.
-  for n = 1, game.num_pills() do
-    local pill = game.pill(n)
-    if pill and not pill.in_tank and
-        within(square_middle(pill.x) - sx, square_middle(pill.y) - sy, PILL_NEAR) then
-      any = true
-      if pill.owner == game.NEUTRAL or not is_friend(p, pill.owner) then
-        enemy = true
-      end
-    end
-  end
-
-  return any, enemy
-end
-
--- A start a tank can be put on: deep sea with no mine.
-local function usable(s)
-  return game.map_tile(s.x, s.y) == game.TERRAIN.deep_sea and
-         not game.is_mine(s.x, s.y)
-end
-
--- lobby is the start the lobby chose for this tank, counted as game.start
--- counts, or nil when it chose none. The lobby chooses for each seat's
--- first tank of the round and for no spawn after it.
-function on_choose_start(p, lobby)
-  -- The opening placement is the lobby's: each player's start, picked by
-  -- hand or by the team's side, is the one handed back. A spawn the lobby
-  -- chose nothing for is Mac Bolo's.
-  if lobby ~= nil then
-    return lobby
-  end
-
-  local count = game.num_starts()
-  if count == 0 then
-    return nil
-  end
-
-  local offset = math.random(count) - 1
-  local no_enemy = nil
-  local first_usable = nil
-
-  for i = 0, count - 1 do
-    local n = (offset + i) % count + 1
-    local s = game.start(n)
-    if s and usable(s) then
-      local any, enemy = survey(p, s)
-      if not any then
-        return n                 -- nothing near at all
-      end
-      if not enemy then
-        no_enemy = n             -- no enemy near: Mac Bolo keeps the last
-      end
-      if first_usable == nil then
-        first_usable = n
-      end
-    end
-  end
-
-  -- With none free of enemies, the first usable start looked at, else the
-  -- map's first start. The engine moves the tank to the nearest clear
-  -- square.
-  return no_enemy or first_usable or 1
-end
