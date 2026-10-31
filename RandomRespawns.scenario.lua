@@ -26,7 +26,7 @@ scenario = {
   description = "Respawns go to a random start. Opening tanks keep the " ..
                 "start the lobby gave them.",
   api = 1,
-  updated = "2026-10-31T17:40Z",
+  updated = "2026-10-31T17:33Z",
   kind = "mod",
   bound = false,
 
