@@ -22,6 +22,7 @@
 
 scenario = {
   name = "Random Respawns",
+  author = "Claude",
   description = "Respawns go to a random start. Opening tanks keep the " ..
                 "start the lobby gave them.",
   api = 1,
