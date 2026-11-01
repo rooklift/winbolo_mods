@@ -44,13 +44,9 @@
 --
 -- Tank hits and mines. In Mac Bolo a shell that hits a tank does not
 -- touch the map square at all; only a shell that hits the ground or
--- terrain sets off a mine. tank_hit_sets_off_mines at 0 plays that way,
--- and 0 is now WinBolo's own default. In WinBolo 2.1 a shell that hit a
--- tank also set off any mine on the square where it burst, so a tank that
--- laid mines as it ran could have them set off by the shots of the tank
--- chasing it. The Tank Hits Set Off Mines mod sets 1 to play that way.
--- This part keeps the rule at 0, so it only changes the round when
--- another script on the list sets 1.
+-- terrain sets off a mine. WinBolo's own default, tank_hit_sets_off_mines
+-- at 0, already plays that way, so this mod does not set the rule. With
+-- the Tank Hits Set Off Mines mod also on the list, its 1 applies.
 --
 -- Starts. WinBolo picks every start itself, as it does with no mod on:
 -- the round's opening tanks go where the lobby put them, and every later
@@ -89,7 +85,7 @@ scenario = {
                 "Turn rates are about 0.1% faster to work around a WinBolo bug. " ..
                 "Spawns use WinBolo's own logic.",
   api = 1,
-  updated = "2026-10-31T17:44Z",
+  updated = "2026-11-01T23:36Z",
   kind = "mod",
   bound = false,
 
@@ -116,10 +112,6 @@ scenario = {
     -- Base defence: a circle of radius 7 round a shot base, edge left out.
     pill_base_defend_shape = 1,
     pill_base_defend_range = 7,
-
-    -- Tank hits and mines: a shell that hits a tank leaves the mines on
-    -- its square alone.
-    tank_hit_sets_off_mines = 0,
 
     -- Turn rates: the classic rates times 1 + 1/1024, so a turning tank
     -- does not stop exactly halfway between two directions (see above).
