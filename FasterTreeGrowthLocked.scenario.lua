@@ -26,6 +26,7 @@
 
 scenario = {
   name = "Faster Tree Growth",
+  author = "jm (mostly)",
   description = "Trees grow back twice as fast.",
   api = 1,
   updated = "2026-10-28T14:01Z",

@@ -29,6 +29,7 @@
 
 scenario = {
   name = "Base Restocking Rate",
+  author = "jm (mostly)",
   description = "Bases refill their own stock twice as often.",
   api = 1,
   updated = "2026-10-28T14:01Z",
