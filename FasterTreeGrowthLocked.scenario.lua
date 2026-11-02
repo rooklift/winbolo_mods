@@ -1,5 +1,5 @@
 -- =========================================================================
--- Faster Tree Growth Locked — the Faster Tree Growth mod fixed at 2x, with
+-- Faster Tree Growth Locked — the Faster Tree Growth mod fixed at 3x, with
 -- nothing for the host to change.
 --
 -- How trees grow in the stock game. Every frame the server picks one map
@@ -11,13 +11,13 @@
 -- starts over. Until the search finds a square worth growing on, the wait is
 -- tree_grow_initial_ticks (30000) instead.
 --
--- This mod halves both waits, to 1500 and 15000: the Faster Tree Growth
--- mod's default. There is no settings table, so the lobby's details dialog
+-- This mod cuts both waits to a third, to 1000 and 10000: the Faster Tree
+-- Growth mod's default. There is no settings table, so the lobby's details dialog
 -- has nothing to set, and every round with this mod on grows trees the same.
 --
 -- The waits are read from the rules as the round has them, not from the
 -- stock numbers, so a map or a scenario that has already changed them is
--- halved from its own values. Soccer's "trees never grow" stays so.
+-- cut to a third of its own values. Soccer's "trees never grow" stays so.
 --
 -- kind = "mod", so it leaves the win condition alone and can be added to
 -- any round, beside a scenario or on its own. bound = false, so it runs
@@ -27,19 +27,19 @@
 scenario = {
   name = "Faster Tree Growth",
   author = "jm (mostly)",
-  description = "Trees grow back twice as fast.",
+  description = "Trees grow back three times as fast.",
   api = 1,
-  updated = "2026-10-28T14:01Z",
+  updated = "2026-11-02T20:20Z",
   kind = "mod",
   bound = false,
 
   callbacks = {
-    on_setup = "Halves the tree growing waits.",
+    on_setup = "Cuts the tree growing waits to a third.",
   },
 }
 
 -- How many times faster trees grow than in the stock game.
-local MULTIPLIER = 2
+local MULTIPLIER = 3
 
 -- The two rules that time tree growth.
 local WAITS = { "tree_grow_ticks", "tree_grow_initial_ticks" }
