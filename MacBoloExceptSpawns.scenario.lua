@@ -61,6 +61,14 @@
 -- more than 60, three quarters of the 80 a full tank holds. This mod sets
 -- big_explosion_threshold to 60.
 --
+-- Parachute speed. A builder who dies parachutes back in, flying straight
+-- at his tank. Mac Bolo moves him every other tick by its trig table
+-- shifted down, so his speed depends on his heading: 1.41 to 2.5 world
+-- units a tick, 1.92 on average. WinBolo moves him lgm_helicopter_speed a
+-- tick, rounded on each axis: 2.83 to 3.61 at the default 3. This mod
+-- sets 2, which is 1.41 to 2.24, 2.09 on average. The rule is a whole
+-- number, so 2 is the nearest it comes to Mac Bolo.
+--
 -- Starts. WinBolo picks every start itself, as it does with no mod on:
 -- the round's opening tanks go where the lobby put them, and every later
 -- spawn uses the engine's own pick, not Mac Bolo's.
@@ -98,7 +106,7 @@ scenario = {
                 "Turn rates are about 0.1% faster to work around a WinBolo bug. " ..
                 "Spawns use WinBolo's own logic.",
   api = 1,
-  updated = "2026-11-02T20:52Z",
+  updated = "2026-11-02T21:33Z",
   kind = "mod",
   bound = false,
 
@@ -131,6 +139,9 @@ scenario = {
 
     -- Superbooms: Mac Bolo's threshold, more than 60 shells and mines.
     big_explosion_threshold = 60,
+
+    -- Parachute speed: the nearest whole number to Mac Bolo's.
+    lgm_helicopter_speed = 2,
 
     -- Turn rates: the classic rates times 1 + 1/1024, so a turning tank
     -- does not stop exactly halfway between two directions (see above).
