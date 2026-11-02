@@ -48,6 +48,12 @@
 -- at 0, already plays that way, so this mod does not set the rule. With
 -- the Tank Hits Set Off Mines mod also on the list, its 1 applies.
 --
+-- Superbooms. A tank that dies carrying enough shells and mines goes up in
+-- a big explosion, which craters a 2 x 2 block and hurts any pillbox in
+-- it. WinBolo needs more than 20 shells and mines together; Mac Bolo needs
+-- more than 60, three quarters of the 80 a full tank holds. This mod sets
+-- big_explosion_threshold to 60.
+--
 -- Starts. WinBolo picks every start itself, as it does with no mod on:
 -- the round's opening tanks go where the lobby put them, and every later
 -- spawn uses the engine's own pick, not Mac Bolo's.
@@ -85,7 +91,7 @@ scenario = {
                 "Turn rates are about 0.1% faster to work around a WinBolo bug. " ..
                 "Spawns use WinBolo's own logic.",
   api = 1,
-  updated = "2026-11-01T23:36Z",
+  updated = "2026-11-02T18:36Z",
   kind = "mod",
   bound = false,
 
@@ -112,6 +118,9 @@ scenario = {
     -- Base defence: a circle of radius 7 round a shot base, edge left out.
     pill_base_defend_shape = 1,
     pill_base_defend_range = 7,
+
+    -- Superbooms: Mac Bolo's threshold, more than 60 shells and mines.
+    big_explosion_threshold = 60,
 
     -- Turn rates: the classic rates times 1 + 1/1024, so a turning tank
     -- does not stop exactly halfway between two directions (see above).
