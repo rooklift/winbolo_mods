@@ -109,7 +109,7 @@ scenario = {
   name = "Mac Bolo Lite",
   author = "jm, canuck, rooklift, claude",
   description = "Mac Bolo minus two annoying parts. " ..
-                "Includes pillbox massage, base defence circle, approximately correct tree growth, etc etc. " ..
+                "Includes pillbox massage, base defence circle, approximately correct tree growth, etc. " ..
                 "Turn rates are about 0.1% faster to work around a WinBolo bug. " ..
                 "Spawns and parachute speed use WinBolo's own logic in this version.",
   api = 1,
