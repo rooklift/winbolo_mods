@@ -1,8 +1,9 @@
 -- =========================================================================
--- Mac Bolo Except Spawns — the Mac Bolo Rules mod with every part on at
--- its default and nothing for the host to change, with every turn rate
--- about 0.1% faster, as a stopgap for a drawing bug, and with WinBolo's
--- own spawn logic in place of Mac Bolo's.
+-- Mac Bolo Lite — Mac Bolo minus the two most annoying parts. It is the
+-- Mac Bolo Rules mod with every part on at its default and nothing for
+-- the host to change, except that spawns and parachute speed stay as
+-- WinBolo has them, and with every turn rate about 0.1% faster, as a
+-- stopgap for a drawing bug.
 --
 -- Shell pushback. A tank a shell hits and survives slides along the
 -- shell's direction of travel. WinBolo slides every tank the same
@@ -61,13 +62,18 @@
 -- more than 60, three quarters of the 80 a full tank holds. This mod sets
 -- big_explosion_threshold to 60.
 --
+-- Tree growth. Trees grow back three times as fast as in WinBolo. The
+-- server holds the best square for a new tree that its random search has
+-- found, and grows a tree there once tree_grow_ticks pass with nothing
+-- better turning up; until the search finds a square worth growing on,
+-- the wait is tree_grow_initial_ticks instead. This mod sets them to 1000
+-- and 10000, a third of WinBolo's 3000 and 30000. Unlike the Faster Tree
+-- Growth mod, it sets these numbers outright rather than dividing the
+-- round's own, so a map or scenario that has changed them is overridden.
+--
 -- Parachute speed. A builder who dies parachutes back in, flying straight
--- at his tank. Mac Bolo moves him every other tick by its trig table
--- shifted down, so his speed depends on his heading: 1.41 to 2.5 world
--- units a tick, 1.92 on average. WinBolo moves him lgm_helicopter_speed a
--- tick, rounded on each axis: 2.83 to 3.61 at the default 3. This mod
--- sets 2, which is 1.41 to 2.24, 2.09 on average. The rule is a whole
--- number, so 2 is the nearest it comes to Mac Bolo.
+-- at his tank. Mac Bolo flies him slower than WinBolo does, but this mod
+-- leaves lgm_helicopter_speed alone, so he comes back at WinBolo's speed.
 --
 -- Starts. WinBolo picks every start itself, as it does with no mod on:
 -- the round's opening tanks go where the lobby put them, and every later
@@ -100,13 +106,14 @@
 -- =========================================================================
 
 scenario = {
-  name = "Mac Bolo Except Spawns",
+  name = "Mac Bolo Lite",
   author = "jm, canuck, rooklift, claude",
-  description = "Includes pillbox massage, base defence circle, parachute speed, etc etc. " ..
+  description = "Mac Bolo minus two annoying parts. " ..
+                "Includes pillbox massage, base defence circle, approximately correct tree growth, etc etc. " ..
                 "Turn rates are about 0.1% faster to work around a WinBolo bug. " ..
-                "Spawns and tree growth use WinBolo's own logic in this version.",
+                "Spawns and parachute speed use WinBolo's own logic in this version.",
   api = 1,
-  updated = "2026-11-02T21:33Z",
+  updated = "2026-11-02T22:22Z",
   kind = "mod",
   bound = false,
 
@@ -140,8 +147,9 @@ scenario = {
     -- Superbooms: Mac Bolo's threshold, more than 60 shells and mines.
     big_explosion_threshold = 60,
 
-    -- Parachute speed: the nearest whole number to Mac Bolo's.
-    lgm_helicopter_speed = 2,
+    -- Tree growth: three times as fast as WinBolo's 3000 and 30000.
+    tree_grow_ticks = 1000,
+    tree_grow_initial_ticks = 10000,
 
     -- Turn rates: the classic rates times 1 + 1/1024, so a turning tank
     -- does not stop exactly halfway between two directions (see above).
