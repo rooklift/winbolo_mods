@@ -102,9 +102,9 @@
 scenario = {
   name = "Mac Bolo Except Spawns",
   author = "jm, canuck, rooklift, claude",
-  description = "Includes pillbox massage, base defence circle, etc etc. " ..
+  description = "Includes pillbox massage, base defence circle, parachute speed, etc etc. " ..
                 "Turn rates are about 0.1% faster to work around a WinBolo bug. " ..
-                "Spawns use WinBolo's own logic.",
+                "Spawns and tree growth use WinBolo's own logic in this version.",
   api = 1,
   updated = "2026-11-02T21:33Z",
   kind = "mod",
