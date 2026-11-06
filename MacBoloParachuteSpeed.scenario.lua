@@ -21,7 +21,7 @@
 
 scenario = {
   name = "Mac Bolo Parachute Speed",
-  author = "claude",
+  author = "Claude",
   description = "Builders parachute back to their tanks at about Mac Bolo's speed, " ..
                 "slower than WinBolo's.",
   api = 1,
