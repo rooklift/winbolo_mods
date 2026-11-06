@@ -2,8 +2,7 @@
 -- Mac Bolo Lite — Mac Bolo minus the two most annoying parts. It is the
 -- Mac Bolo Rules mod with every part on at its default and nothing for
 -- the host to change, except that spawns and parachute speed stay as
--- WinBolo has them, and with every turn rate about 0.1% faster, as a
--- stopgap for a drawing bug.
+-- WinBolo has them.
 --
 -- Shell pushback. A tank a shell hits and survives slides along the
 -- shell's direction of travel. WinBolo slides every tank the same
@@ -62,14 +61,9 @@
 -- more than 60, three quarters of the 80 a full tank holds. This mod sets
 -- big_explosion_threshold to 60.
 --
--- Tree growth. Trees grow back three times as fast as in WinBolo. The
--- server holds the best square for a new tree that its random search has
--- found, and grows a tree there once tree_grow_ticks pass with nothing
--- better turning up; until the search finds a square worth growing on,
--- the wait is tree_grow_initial_ticks instead. This mod sets them to 1000
--- and 10000, a third of WinBolo's 3000 and 30000. Unlike the Faster Tree
--- Growth mod, it sets these numbers outright rather than dividing the
--- round's own, so a map or scenario that has changed them is overridden.
+-- Tree growth. WinBolo's own tree growth rate now more or less matches
+-- Mac Bolo's, so this mod leaves tree_grow_ticks and
+-- tree_grow_initial_ticks alone.
 --
 -- Parachute speed. A builder who dies parachutes back in, flying straight
 -- at his tank. Mac Bolo flies him slower than WinBolo does, but this mod
@@ -78,23 +72,6 @@
 -- Starts. WinBolo picks every start itself, as it does with no mod on:
 -- the round's opening tanks go where the lobby put them, and every later
 -- spawn uses the engine's own pick, not Mac Bolo's.
---
--- Turn rates. With the Mac Bolo tank collision boxes on, a tank whose
--- heading is exactly halfway between two of the 16 directions (8, 24 ...
--- 248, out of 256) drives the higher direction but is drawn as the lower
--- one, so a tank stopped on 72 looks east and drives east-south-east. The
--- classic turn rates (1, 0.5 and 0.25 a tick, an eighth of that while a
--- turn starts) add up to exact whole numbers, so a turning tank stops on
--- these headings often. Every turn rate here is its classic value times
--- 1 + 1/1024, about 0.1% faster, which nobody can feel. The factor is a
--- power-of-two fraction, so every heading a tank can reach stays exact: a
--- turn that would stop on 72 stops 1/128 or 3/128 to one side of it
--- instead. That is enough to survive the server cutting the heading down
--- to 1/256 when it sends it to the other players, which a smaller nudge
--- does not. Only a tank that has turned about 16 whole circles more one
--- way than the other since it spawned can still land on a halfway heading,
--- and a script that teleports a tank to face exactly halfway still shows
--- the bug. Once WinBolo itself is fixed, put the classic turn rates back.
 --
 -- There is no settings table, so the lobby's details dialog has nothing to
 -- set, and every round with this mod on plays the same rules. A host who
@@ -109,11 +86,10 @@ scenario = {
   name = "Mac Bolo Lite",
   author = "jm, canuck, rooklift, claude",
   description = "Mac Bolo minus two annoying parts. " ..
-                "Includes pillbox massage, base defence circle, approximately correct tree growth, etc. " ..
-                "Turn rates are about 0.1% faster to work around a WinBolo bug. " ..
+                "Includes pillbox massage, base defence circle, etc. " ..
                 "Spawns and parachute speed use WinBolo's own logic in this version.",
   api = 1,
-  updated = "2026-11-02T22:22Z",
+  updated = "2026-11-06T00:00Z",
   kind = "mod",
   bound = false,
 
@@ -146,22 +122,5 @@ scenario = {
 
     -- Superbooms: Mac Bolo's threshold, more than 60 shells and mines.
     big_explosion_threshold = 60,
-
-    -- Tree growth: three times as fast as WinBolo's 3000 and 30000.
-    tree_grow_ticks = 1000,
-    tree_grow_initial_ticks = 10000,
-
-    -- Turn rates: the classic rates times 1 + 1/1024, so a turning tank
-    -- does not stop exactly halfway between two directions (see above).
-    turn_road = 1.0009765625,
-    turn_grass = 1.0009765625,
-    turn_forest = 0.50048828125,
-    turn_river = 0.250244140625,
-    turn_swamp = 0.250244140625,
-    turn_crater = 0.250244140625,
-    turn_rubble = 0.250244140625,
-    turn_boat = 1.0009765625,
-    turn_deep_sea = 0.50048828125,
-    turn_refuel_base = 1.0009765625,
   },
 }
