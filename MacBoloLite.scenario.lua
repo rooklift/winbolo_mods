@@ -37,10 +37,11 @@
 --
 -- Pillbox shell range. A Mac Bolo pillbox's shell starts half a square
 -- out and flies 32 steps of about a quarter square, so it falls 2143 to
--- 2175 world units (256 to a square) from the pillbox, by direction.
--- WinBolo's starts 160 out and flies pill_fire_length, 8.5 by default,
--- which ends it 2208 out, a quarter square further. This mod sets
--- pill_fire_length to 8.25, which ends it 2144 out.
+-- 2192 world units (256 to a square) from the pillbox by direction, 2166
+-- on average. WinBolo's starts 160 out and flies pill_fire_length, 8.5 by
+-- default, which ends it 2208 out, past Mac Bolo's in every direction.
+-- This mod sets pill_fire_length to 8.375, which ends it 2176 out, the
+-- nearest WinBolo can get to Mac Bolo's average.
 --
 -- Base defence. When a base is shot, every allied pillbox near it gets
 -- angry and fires faster. WinBolo has always counted "near" as a square:
@@ -113,8 +114,9 @@ scenario = {
     -- Angry pillbox fire rate: Mac Bolo's fastest, a shot every 5 ticks.
     pill_attack_min_ticks = 5,
 
-    -- Pillbox shell range: a shell falls 2144 world units out, not 2208.
-    pill_fire_length = 8.25,
+    -- Pillbox shell range: a shell falls 2176 world units out, near Mac
+    -- Bolo's average of 2166, not 2208.
+    pill_fire_length = 8.375,
 
     -- Base defence: a circle of radius 7 round a shot base, edge left out.
     pill_base_defend_shape = 1,
