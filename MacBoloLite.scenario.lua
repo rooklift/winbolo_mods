@@ -2,7 +2,13 @@
 -- Mac Bolo Lite — Mac Bolo minus the two most annoying parts. It is the
 -- Mac Bolo Rules mod with every part on at its default and nothing for
 -- the host to change, except that spawns and parachute speed stay as
--- WinBolo has them.
+-- WinBolo has them. It also leaves the builder blast area as WinBolo has
+-- it.
+--
+-- Written for WinBolo 2.2.2 or later. Where this mod leaves a rule alone
+-- it plays that version's default, and an older server's defaults differ:
+-- its pillbox shells fly an eighth of a square further and its builder
+-- blast circle is 128 world units, not 144.
 --
 -- Shell pushback. A tank a shell hits and survives slides along the
 -- shell's direction of travel. WinBolo slides every tank the same
@@ -14,9 +20,10 @@
 -- tank_bump_decay_shift, are read per 40 ms, so a push travels
 -- step * 2^shift in all, in a slide that moves every tick.
 --
--- Pillbox shell cap. Mac Bolo keeps twelve shell slots for the pillbox
--- shells in the air at one tank. pill_shell_cap turns WinBolo's version of
--- that limit on, at pill_max_shells_at_tank, twelve.
+-- Pillbox shell cap. No more than pill_max_shells_at_tank pillbox shells
+-- are in the air at any one tank. A pillbox whose nearest target already
+-- has that many coming loses its shot and reloads. pill_shell_cap turns
+-- the limit on, and this mod sets it to twelve.
 --
 -- Tank clearance. Use the original direction-dependent tank boxes and
 -- pixel nudges against solid tiles, allowing close passes beside pills.
@@ -62,6 +69,12 @@
 -- at his tank. Mac Bolo flies him slower than WinBolo does, but this mod
 -- leaves lgm_helicopter_speed alone, so he comes back at WinBolo's speed.
 --
+-- Builder blast. A shell or mine that goes off on open ground kills a
+-- builder near it. Mac Bolo counts "near" as a box: under 128 world units
+-- from the explosion on each axis. WinBolo counts it as a circle of radius
+-- 144, which has about the box's area. This mod leaves lgm_blast_shape
+-- alone, so the circle applies.
+--
 -- Starts. WinBolo picks every start itself, as it does with no mod on:
 -- the round's opening tanks go where the lobby put them, and every later
 -- spawn uses the engine's own pick, not Mac Bolo's.
@@ -80,9 +93,10 @@ scenario = {
   author = "jm, canuck, rooklift, claude",
   description = "Mac Bolo minus two annoying parts. " ..
                 "Includes pillbox massage, base defence circle, etc. " ..
-                "Spawns and parachute speed use WinBolo's own logic in this version.",
+                "Spawns and parachute speed use WinBolo's own logic in this version. " ..
+                "The builder blast area is WinBolo's circle too, not Mac Bolo's box.",
   api = 1,
-  updated = "2026-11-26T00:00Z",
+  updated = "2026-11-27T00:00Z",
   kind = "mod",
   bound = false,
 
