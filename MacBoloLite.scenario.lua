@@ -3,7 +3,7 @@
 -- Mac Bolo Rules mod with every part on at its default and nothing for
 -- the host to change, except that spawns and parachute speed stay as
 -- WinBolo has them. It also leaves the builder blast area as WinBolo has
--- it.
+-- it, and it starts every pillbox calm whatever the map says.
 --
 -- Written for WinBolo 2.2.2 or later. Where this mod leaves a rule alone
 -- it plays that version's default, and an older server's defaults differ:
@@ -41,6 +41,16 @@
 -- one tick after the count runs out, so an angry pillbox's fastest is a
 -- shot every 5 ticks. WinBolo fires as the count runs out, and floors it
 -- at pill_attack_min_ticks, 6 by default. This part sets it to 5.
+--
+-- Starting pillbox fire rate. A map gives each pillbox its own ticks
+-- between shots, and 50 is as common as the calm 100. WinBolo starts a
+-- pillbox at the map's number and lets it cool to calm, one tick slower
+-- every pill_cooldown_ticks, so a 50 fires fast for the round's first half
+-- minute. This mod sets every such pillbox to one tick short of calm
+-- before the round's first tick, and it cools the last tick within a
+-- second. It is set one short, not to calm itself, because the cooldown
+-- the map's number started is still counting and would carry a pillbox
+-- set to calm one tick past it.
 --
 -- Base defence. When a base is shot, every allied pillbox near it gets
 -- angry and fires faster. WinBolo has always counted "near" as a square:
@@ -127,4 +137,23 @@ scenario = {
     -- Superbooms: Mac Bolo's threshold, more than 60 shells and mines.
     big_explosion_threshold = 60,
   },
+
+  -- What the callback below does, in a line a player reads: the lobby's
+  -- details dialog lists it under "What this mod implements:".
+  callbacks = {
+    on_setup = "Starts every pillbox at the calm firing rate, whatever the map says.",
+  },
 }
+
+-- Once, after the rules above are applied and before the round's first
+-- tick. A pillbox the map started faster than calm is set to one tick
+-- short of calm; one already calm is left alone.
+function on_setup()
+  local calm = game.rule("pill_attack_ticks")
+  for n = 1, game.num_pills() do
+    local pill = game.pill(n)
+    if pill ~= nil and pill.speed < calm then
+      game.set_pill_speed(n, calm - 1)
+    end
+  end
+end
